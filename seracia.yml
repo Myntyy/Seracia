@@ -1,0 +1,6 @@
+---
+- hosts: Pennie
+  become: yes
+  become_user: root
+  roles:
+  - twitch

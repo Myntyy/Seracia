@@ -1,0 +1,16 @@
+---
+- name: Create docker container
+  docker_container:
+    name: seracia
+    image: twitch
+    ports:
+      - 5000:5000
+
+- name: Deploy code to docker container
+  docker_container_run:
+    container: seracia
+    command: python3 /app/bot.py
+
+- name: Start docker container
+  docker_container_start:
+    container: seracia

@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  twitch:
+    image: twitch
+    ports:
+      - 5000:5000
