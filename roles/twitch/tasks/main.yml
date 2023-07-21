@@ -9,7 +9,9 @@
 - name: Deploy code to docker container
   docker_container_run:
     container: seracia
-    command: "python3 /app/bot.py"
+    command:
+      - python3
+      - /app/bot.py
 
 - name: Start docker container
   docker_container_start:
