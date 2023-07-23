@@ -1,26 +1,35 @@
 pipeline {
     agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
     
     stages {
-        stage("Mise à jour Seracia") {
+        stage('Build') {
             steps {
-                script {
-                    withEnv(["PYTHONIOENCODING=UTF-8", "ANSIBLE_SUDO_PASS=jenkins"]) {
-                        ansiblePlaybook(
-                            colorized: true,
-                            credentialsId: 'Github',
-                            disableHostKeyChecking: true,
-                            installation: 'Ansible',
-                            inventory: 'inventory/inventory.ini',
-                            playbook: 'seracia.yml',
-                            extraVars: [
-                                ANSIBLE_HOST_KEY_CHECKING: "False"
-                            ],
-                            forks: 1
-                        )
-                    }
-                }
+                sh 'docker build -t mynty/seracia .'
             }
+        }
+
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+
+        stage('Push') {
+            steps {
+                sh 'docker push mynty/seracia'
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout'
         }
     }
 }
